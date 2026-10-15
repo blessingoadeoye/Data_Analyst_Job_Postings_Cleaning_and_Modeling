@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Real-world datasets are rarely ready for analysis the moment they are collected.
+Real-world datasets are rarely ready to be used for analysis the moment they are collected.
 
 Before trends can be measured or conclusions drawn, the underlying data needs to be checked for duplication, inconsistent formatting, unsuitable data types, missing information, and structural problems that could distort downstream results.
 
@@ -32,6 +32,25 @@ The final model contains:
 
 The resulting database is organized primarily around three tables: `jobs`, `companies`, and `job_skills`.
 
+### Access the Cleaned and Modeled Dataset
+
+The final dataset is published on Kaggle:
+
+**[Data Analyst Job Postings (2022–2025) — Kaggle](https://www.kaggle.com/datasets/blessingodamilola/data-analyst-job-postings-2022-2025)**
+
+The published dataset contains three CSV files:
+
+| File | Records | Description |
+|---|---:|---|
+| `jobs.csv` | 58,775 | Deduplicated job postings with their analytical attributes. |
+| `companies.csv` | 13,178 | Standardized company records linked to job postings. |
+| `job_skills.csv` | 190,002 | Individual job-skill relationships using standardized skill names. |
+
+The CSV files contain the resulting data, while this GitHub repository documents the SQL transformations, modeling decisions, and validation process used to prepare them.
+
+The tables can be connected through `company_id` and `job_id`.
+
+
 ### Explore the SQL Workflow
 
 The complete documented SQL workflow—including the audit queries, cleaning decisions, transformations, technical explanations, and validation checks—is organized into sequential stages, and available here:
@@ -52,9 +71,20 @@ The complete documented SQL workflow—including the audit queries, cleaning dec
 
 A job-postings dataset can reliably answer questions about salaries, employers, locations, skills, remote work, and other labor-market characteristics—but only when the records underneath those analyses are sufficiently reliable.
 
-The source data presented several issues that could affect such analysis.
+### Initial Dataset Assessment
 
-For example, the raw dataset contained more rows than unique job IDs. Location strings contained substantial whitespace inconsistencies. Equivalent companies could appear under different letter cases. Skill names contained aliases, while thousands of jobs had no supplied skill tokens at all.
+Before designing the cleaning queries, I examined the available fields to understand the dataset's structure and identify questions worth investigating.
+
+| Initial observation | Question it raised |
+|---|---|
+| The dataset contained 61,953 observations | Did every row represent a unique job posting? |
+| Job identifiers and timestamps were available | Could some job IDs represent repeated observations? |
+| Several salary fields were included | Were the values complete and suitable for calculations? |
+| Company names and locations were stored as text | Were there inconsistencies naming or formatting? |
+| Skill tokens appeared alongside job descriptions | How complete and reliable was the identifiable skill information? |
+| Job, company, and skill attributes shared one wide table | Would separating these entities better improve future analysis? |
+
+These were questions raised during the initial assessment, not confirmed data-quality issues. The subsequent SQL investigations established which concerns were present and how they should be addressed.
 
 Rather than immediately using the dataset to answer job-market questions, I focused first on a more fundamental question:
 
@@ -98,9 +128,9 @@ Several tools supported different parts of the workflow:
 
 * **Visual Studio Code:** My primary working environment for developing, organizing, documenting, and executing the SQL workflow.
 
-* **Git & GitHub:** Used for version control and for publishing the project, SQL workflow, supporting documentation, and project structure in a reproducible portfolio format.
+* **Git & GitHub:** Used for version control and publishing the SQL workflow, technical explanations, validation evidence, and supporting project documentation. The resulting modeled dataset is hosted separately on [Kaggle](https://www.kaggle.com/datasets/blessingodamilola/data-analyst-job-postings-2022-2025) for public access.
 
-* **ChatGPT:** Used selectively as a technical brainstorming and syntax-support tool, particularly while developing safer approaches for some of the more advanced SQL logic. Suggested approaches were inspected, adapted to the project context, executed against the database, and validated before being incorporated into the final workflow.
+* **ChatGPT:** Used selectively as a technical brainstorming and syntax-support tool. Particularly for initial assessment of the raw dataset to identify potential data-quality concerns, and to develop safer approaches for some more advanced SQL logic. Suggested approaches were then inspected, adapted to the project context, executed against the database, and validated before being incorporated into the final workflow.
 
 ---
 
@@ -641,4 +671,6 @@ For that reason, I approached the workflow by requiring a clear reason for each 
 
 The project also showed how SQL can move beyond querying existing data and become a tool for **data-quality investigation, controlled recovery, structural modeling, and integrity enforcement**.
 
-With the cleaning and relational modeling complete, the resulting `jobs`, `companies`, and `job_skills` tables now provide the foundation for a separate downstream analysis of the job-postings data.
+With the cleaning and relational modeling complete, the resulting `jobs`, `companies`, and `job_skills` tables have been [published on Kaggle](https://www.kaggle.com/datasets/blessingodamilola/data-analyst-job-postings-2022-2025).
+
+These validated tables now provide the foundation for a separate downstream analysis of the job-postings data.
